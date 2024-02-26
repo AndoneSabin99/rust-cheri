@@ -1428,6 +1428,7 @@ macro_rules! fnptr_impls_safety_abi {
             // This is ok because the pointer created from this round-trip is
             // passed to code that will only ever print its address.
             // The invalid pointer is safe because it won't be dereferenced.
+            #[cfg_attr(all(target_arch = "wasm", target_abi = "purecap"), warn(usize_as_pointer))]
             #[cfg_attr(all(target_arch = "aarch64", target_abi = "purecap"), allow(usize_as_pointer))]
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 // HACK: The intermediate cast as usize is required for AVR
@@ -1444,6 +1445,7 @@ macro_rules! fnptr_impls_safety_abi {
             // This is ok because the pointer created from this round-trip is
             // passed to code that will only ever print its address.
             // The invalid pointer is safe because it won't be dereferenced.
+            #[cfg_attr(all(target_arch = "wasm", target_abi = "purecap"), warn(usize_as_pointer))]
             #[cfg_attr(all(target_arch = "aarch64", target_abi = "purecap"), allow(usize_as_pointer))]
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 // HACK: The intermediate cast as usize is required for AVR

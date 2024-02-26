@@ -185,6 +185,7 @@ struct WaiterQueue<'a> {
 impl Once {
     /// Creates a new `Once` value.
     #[inline]
+    #[cfg_attr(all(target_arch = "wasm", target_abi = "purecap"), warn(usize_as_pointer))]
     #[cfg_attr(all(target_arch = "aarch64", target_abi = "purecap"), allow(usize_as_pointer))]
     #[stable(feature = "once_new", since = "1.2.0")]
     #[rustc_const_stable(feature = "const_once_new", since = "1.32.0")]
@@ -396,6 +397,7 @@ impl Once {
                 POISONED | INCOMPLETE => {
                     // Try to register this thread as the one RUNNING.
                     #[cfg_attr(all(target_arch = "aarch64", target_abi = "purecap"), allow(usize_as_pointer))]
+                    #[cfg_attr(all(target_arch = "wasm", target_abi = "purecap"), warn(usize_as_pointer))]
                     let exchange_result = self.state_and_queue.compare_exchange(
                         state_and_queue,
                         RUNNING as *mut Masked,
@@ -409,6 +411,7 @@ impl Once {
                     // `waiter_queue` will manage other waiting threads, and
                     // wake them up on drop.
                     #[cfg_attr(all(target_arch = "aarch64", target_abi = "purecap"), allow(usize_as_pointer))]
+                    #[cfg_attr(all(target_arch = "wasm", target_abi = "purecap"), warn(usize_as_pointer))]
                     let mut waiter_queue = WaiterQueue {
                         state_and_queue: &self.state_and_queue,
                         set_state_on_drop_to: POISONED as *mut Masked,
@@ -416,6 +419,7 @@ impl Once {
                     // Run the initialization function, letting it know if we're
                     // poisoned or not.
                     #[cfg_attr(all(target_arch = "aarch64", target_abi = "purecap"), allow(usize_as_pointer))]
+                    #[cfg_attr(all(target_arch = "wasm", target_abi = "purecap"), warn(usize_as_pointer))]
                     let init_state = OnceState {
                         poisoned: state_and_queue as usize == POISONED,
                         set_state_on_drop_to: Cell::new(COMPLETE as *mut Masked),
@@ -573,6 +577,7 @@ impl OnceState {
     /// Poison the associated [`Once`] without explicitly panicking.
     // NOTE: This is currently only exposed for the `lazy` module
     #[cfg_attr(all(target_arch = "aarch64", target_abi = "purecap"), allow(usize_as_pointer))]
+    #[cfg_attr(all(target_arch = "wasm", target_abi = "purecap"), warn(usize_as_pointer))]
     pub(crate) fn poison(&self) {
         self.set_state_on_drop_to.set(POISONED as *mut Masked);
     }

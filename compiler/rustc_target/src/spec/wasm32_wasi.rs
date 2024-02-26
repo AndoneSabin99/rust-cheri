@@ -73,7 +73,7 @@
 //! you know what you're getting in to!
 
 use super::wasm_base;
-use super::{crt_objects, LinkerFlavor, LldFlavor, Target};
+use super::{crt_objects, LinkerFlavor, LldFlavor, Target, MergeFunctions};
 
 pub fn target() -> Target {
     let mut options = wasm_base::options();
@@ -106,11 +106,29 @@ pub fn target() -> Target {
     // `args::args()` makes the WASI API calls itself.
     options.main_needs_argc_argv = false;
 
+    //NEW ADDITIONS!!!
+
+    // And, WASI mangles the name of "main" to distinguish between different
+    // signatures.
+    //options.entry_name = "__original_main()".into();
+
+    options.features = "+atomics,+bulk-memory,+mutable-globals".to_string();
+    options.llvm_abiname = "purecap".to_string();
+    options.abi = "purecap".to_string(); // just for identification via `#[cfg(target_abi=...)]` attributes
+    options.max_atomic_width = Some(64);
+    
+    // Atomic pointers are supported and converting to integers
+    // invalidates CHERI capabilities so we *must* use atomic pointers.
+    options.atomic_pointers_via_integers = false;
+    // TODO: figure out why this optimisation causes crashes when building libc.
+    options.merge_functions = MergeFunctions::Disabled;
+
     Target {
         llvm_target: "wasm32-wasi".to_string(),
         pointer_range: 32,
-        pointer_width: 32,
-        data_layout: "e-m:e-p:32:32-i64:64-n32:64-S128-ni:1:10:20".to_string(),
+        pointer_width: 64,
+        //data_layout: "e-m:e-p:32:32-i64:64-n32:64-S128-ni:1:10:20".to_string(),
+        data_layout: "e-m:e-p:32:32-i64:64-n32:64-S128-pf200:64:64:64:32-A200-P0-G200".to_string(),
         arch: "wasm32".to_string(),
         options,
     }

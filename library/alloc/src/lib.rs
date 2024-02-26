@@ -71,6 +71,7 @@
 #![needs_allocator]
 #![feature(cfg_target_abi)]
 #![cfg_attr(all(target_arch = "aarch64", target_abi = "purecap"), warn(usize_as_pointer))]
+#![cfg_attr(all(target_arch = "wasm", target_abi = "purecap"), warn(usize_as_pointer))]
 #![warn(deprecated_in_future)]
 #![warn(missing_docs)]
 #![warn(missing_debug_implementations)]

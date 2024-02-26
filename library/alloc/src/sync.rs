@@ -1677,6 +1677,7 @@ impl<T> Weak<T> {
     /// assert!(empty.upgrade().is_none());
     /// ```
     #[cfg_attr(all(target_arch = "aarch64", target_abi = "purecap"), allow(usize_as_pointer))]
+    #[cfg_attr(all(target_arch = "wasm", target_abi = "purecap"), warn(usize_as_pointer))]
     #[stable(feature = "downgraded_weak", since = "1.10.0")]
     pub fn new() -> Weak<T> {
         Weak { ptr: NonNull::new(usize::MAX as *mut ArcInner<T>).expect("MAX is not 0") }
